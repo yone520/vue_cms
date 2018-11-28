@@ -1,14 +1,6 @@
  <template>
   <div id="app">
-    <div class="container">
-      <app_header class="header"></app_header>
-      <div class="content">
-        <app_aside class="aside"></app_aside>
-        <main class="main">
-          <router-view/>
-        </main>
-      </div>
-    </div>
+    <router-view></router-view>
   </div>
 </template>
 
