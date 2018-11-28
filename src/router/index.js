@@ -6,6 +6,7 @@ import App from '../App'
 const home = r => require.ensure([], () => r(require('../views/home/')), 'home');
 const user = r => require.ensure([], () => r(require('../views/user/')), 'user');
 const money = r => require.ensure([], () => r(require('../views/money/')), 'money');
+const notfound = r => require.ensure([], () => r(require('../views/notFound/')), 'notfound');
 
 Vue.use(Router)
 
@@ -23,6 +24,9 @@ export default new Router({
     }, {
       path: '/money',
       component: money
-    }
+    }, {
+      path:'*',
+      component: notfound
+  }
   ]
 })
