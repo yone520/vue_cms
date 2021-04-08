@@ -22,6 +22,25 @@ import Bbbb from './components/bb.vue'
 import { FormData, OptionsType } from './components/types';
 import dayjs from 'dayjs'
 
+{
+        type: "composite",
+        model: "dangqianxuanzhong",
+        selectType: "datetimerange",
+        modelName: "选项1",
+        aaaaaaValue: ['begin_time', 'end_time'],
+        default: [new Date(), new Date()],
+        options: [
+          {
+            value: "选项1",
+            label: "哈哈哈",
+          },
+          {
+            value: "选项2",
+            label: "呵呵呵",
+          },
+        ],
+        rules: [{ required: true, message: "请选择时间", trigger: "change" }],
+      }
 
 export default defineComponent({
   name: 'App',
