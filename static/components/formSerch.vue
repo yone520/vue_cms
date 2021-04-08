@@ -1,6 +1,13 @@
 <template>
-  <el-form :inline="true" ref="validateForm" :model="formInline" class="demo-form-inline" v-bind="$attrs">
+  <el-form :inline="true" ref="validateForm" :rules="rules" :model="formInline" class="demo-form-inline" v-bind="$attrs">
     <el-form-item v-for="(item, i) in FormDataList" :key="i" :label="item.label" :prop="item.model">
+      <abcd v-model="formInline[item.model]" :type="item.selectType" v-if="item.type === 'composite'" :selectvalue="item.modelName" :options="item.options">
+        <template #prepend>
+          <el-select v-model="item.modelName" placeholder="请选择">
+            <el-option v-for="cItem in item.options" :key="cItem.value" :label="cItem.label" :value="cItem.value"></el-option>
+          </el-select>
+        </template>
+      </abcd>
       <!-- INPUT -->
       <el-input v-if="item.type === undefined || item.type === 'input'" :clearable="true" v-model="formInline[item.model]" :placeholder="item.placeholder ? item.placeholder : '请输入'+item.label"></el-input>
       <!-- SELECT -->
@@ -42,7 +49,7 @@
       </el-date-picker>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="$attrs.onOnSubmit(formInline)">查询</el-button>
+      <el-button type="primary" @click="submitForm">查询</el-button>
       <el-button @click="resetForm">重置</el-button>
     </el-form-item>
   </el-form>
@@ -52,9 +59,14 @@
 import { defineComponent, unref, ref, PropType, nextTick } from 'vue'
 import { FormData, RefObjectKeyRulesType, OptionsType } from './types';
 import {ElForm} from 'element-plus'
+import Abcd from './bb.vue';
+import _ from 'lodash';
 
 export default defineComponent({
   name: 'bgSerch',
+  components: {
+    Abcd
+  },
   props: {
     FormDataList: {
       type: Array as PropType<FormData[]>,
@@ -65,6 +77,7 @@ export default defineComponent({
   setup(props, ctx) {
     const formInline = ref<RefObjectKeyRulesType>({});
     const validateForm = ref(ElForm);
+    const rules = ref<RefObjectKeyRulesType>({});
     const axiosFn = (url: string, bool: boolean) => {
       return new Promise((resolve, reject) => {
         if (bool) {
@@ -103,8 +116,12 @@ export default defineComponent({
         }
       })
     }
-    props.FormDataList.forEach((item: FormData) => {
+    props.FormDataList.forEach((item: any) => {
       formInline.value[item.model] = item.default ? item.default : ''
+      // 添加rules
+      if (item.rules) {
+        rules.value[item.model] = item.rules
+      }
     })
 
     props.FormDataList.forEach(async (item: FormData) => {
@@ -119,6 +136,33 @@ export default defineComponent({
       nextTick(() => {
         (validateForm.value as typeof ElForm).resetFields();
       })
+    }
+    const submitForm = () => {
+      validateForm.value.validate((valid: any) => {
+          if (valid) {
+            const obj = _.cloneDeep(formInline);
+            props.FormDataList.forEach(item => {
+              if (item.type === 'composite') {
+                if (['datetimerange', 'daterange'].includes(item.selectType)) {
+                  // 是时间选择器
+                  if (item.aaaaaaValue && Array.isArray(item.aaaaaaValue) && item.aaaaaaValue.length === 2) {
+                    alert(123)
+                    obj.value[item.aaaaaaValue[0]] = obj.value[item.model][0]
+                    obj.value[item.aaaaaaValue[1]] = obj.value[item.model][1]
+                    obj.value[item.model] = item.modelName;
+                  }
+                } else {
+                  obj.value[item.modelName] = obj.value[item.model]
+                }
+              }
+            })
+            console.log(obj)
+            alert('submit!');
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
     }
     const shortcuts = ref([{
       text: '最近一周',
@@ -158,6 +202,8 @@ export default defineComponent({
       resetForm,
       shortcuts,
       formInline,
+      rules,
+      submitForm,
       datearr: ref<string[]>(['datetimerange', 'daterange'])
     }
   }
