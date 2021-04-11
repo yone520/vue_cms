@@ -124,6 +124,12 @@ export default defineComponent({
 
     const FormDataList = ref([
       {
+        type: 'doubleInput',
+        model: 'one',
+        max: 'two',
+        label: '价格区间',
+      },
+      {
         label: "审批人",
         model: "user",
         default: "哈哈哈",
