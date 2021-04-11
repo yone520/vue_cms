@@ -1,3 +1,106 @@
+<DoubleInput 
+        v-if="item.type === 'doubleInput'" 
+        v-model:min="formInline[item.model]"
+        v-model:max="formInline[item.max]">
+      </DoubleInput>
+      
+      
+      
+      <template>
+  <div class="doubleinput">
+    <el-input
+        placeholder="min"
+        v-model="min"
+        @blur="change(0)"
+        clearable
+    >
+    </el-input>
+    ~
+    <el-input
+        placeholder="max"
+        v-model="max"
+        @blur="change(1)"
+        clearable
+    >
+    </el-input>
+  </div>
+</template>
+
+<script>
+import { computed, defineComponent, ref } from 'vue'
+import { ElMessage } from 'element-plus';
+
+export default defineComponent({
+    props: {
+        min: {
+            type: [Number, String]
+        },
+        max: {
+            type: [Number, String]
+        }
+    },
+    emits: ['update:min', 'update:max'],
+    setup(props, ctx) {
+        const reg = /^\d+(\.\d{0,2})?$/;
+        const min = computed({
+            get: () => props.min,
+            set: value => {
+                ctx.emit('update:min', value)
+            }
+        })
+        const max = computed({
+            get: () => props.max,
+            set: value => {
+                ctx.emit('update:max', value)
+            }
+        })
+        const change = (type) => {
+            if (type) {
+                const val = Number.parseFloat(max.value);
+                if (Number.isNaN(val)) {
+                    max.value = ''
+                } else {
+                    max.value = val.toFixed(2)
+                }
+            } else {
+                const val = Number.parseFloat(min.value);
+                if (Number.isNaN(val)) {
+                    min.value = ''
+                } else {
+                    min.value = val.toFixed(2)
+                }
+            }
+            // 判断max不能小于min
+            if (Number(max.value) < Number(min.value)) {
+                max.value = min.value
+            }
+        }
+        return {
+            min,
+            max,
+            change
+        }
+    }
+})
+</script>
+
+<style scoped>
+.doubleinput {
+    display: flex;
+    border-radius: 4px;
+    border: 1px solid #DCDFE6;
+    box-sizing: border-box;
+}
+.doubleinput ::v-deep(.el-input__inner){
+    border: none;
+    width: 100px;
+    text-align: center;
+}
+</style>
+      
+      
+      
+
 <template>
   <!-- <Serch v-model="msg" v-model:title="title" ganniniang="jjjj" @hack="hack">
     <button>hahah</button>
